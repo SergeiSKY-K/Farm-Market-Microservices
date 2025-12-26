@@ -13,29 +13,19 @@ public class GatewayRoutes {
         return builder.routes()
 
                 .route("auth-service", r -> r
-                        .path("/auth/**")
-                        .uri("http://auth-service:8081")
+                        .path("/auth/**", "/users/**")
+                        .uri("https://auth-service-f376.onrender.com")
                 )
 
                 .route("product-service", r -> r
-                        .path("/products/**")
-                        .uri("http://product-service:8080")
+                        .path("/products/**", "/files/**")
+                        .uri("https://product-service-rvbw.onrender.com")
                 )
 
                 .route("farm-market", r -> r
                         .path("/farm/**", "/orders/**")
-                        .uri("http://farm-market:8080")
+                        .uri("https://farm-market-p5da.onrender.com")
                 )
-
-                .route("auth-users", r -> r
-                        .path("/users/**")
-                        .uri("http://auth-service:8081")
-                )
-                .route("files", r -> r
-                        .path("/files/**")
-                        .uri("http://product-service:8080")
-                )
-
 
                 .build();
     }
