@@ -36,3 +36,9 @@ build/
 # Ignore environment variables
 .env
 .env.*
+
+
+# build artifacts
+**/target/
+**/out/
+*.jar
