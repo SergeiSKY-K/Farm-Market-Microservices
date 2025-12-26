@@ -1,0 +1,65 @@
+version: "3.9"
+
+services:
+
+  mongo:
+    image: mongo:8.0.5
+    container_name: mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+  auth-service:
+    build: ./auth-service
+    container_name: auth-service
+    depends_on:
+      - mongo
+    env_file:
+      - .env
+    environment:
+      SPRING_DATA_MONGODB_URI: mongodb://mongo:27017/auth-db
+
+  product-service:
+    build:
+      context: .
+      dockerfile: product-service/Dockerfile
+    container_name: product-service
+    ports:
+      - "8082:8080"
+    depends_on:
+      - mongo
+    env_file:
+      - .env
+    environment:
+      SPRING_DATA_MONGODB_URI: mongodb://mongo:27017/product-db
+
+  farm-market:
+    build:
+      context: .
+      dockerfile: farm-market/Dockerfile
+    container_name: farm-market
+    ports:
+      - "8083:8080"
+    depends_on:
+      - mongo
+    env_file:
+      - .env
+    environment:
+      SPRING_DATA_MONGODB_URI: mongodb://mongo:27017/farm-db
+
+  api-gateway:
+    build: ./api-gateway
+    container_name: api-gateway
+    ports:
+      - "9000:9000"
+    depends_on:
+      - auth-service
+      - product-service
+      - farm-market
+    env_file:
+      - .env
+
+volumes:
+  mongo_data:
+    name: mongo_data

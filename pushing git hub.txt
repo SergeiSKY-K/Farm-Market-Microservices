@@ -1,0 +1,75 @@
+🔴 Что сейчас не так
+
+Исторически у тебя было:
+
+монолит → один репозиторий Farm-Market-Project ✔️
+
+Теперь стало:
+
+api-gateway
+
+auth-service
+
+product-service
+
+farm-market
+
+shared-kafka-events
+
+frontend
+
+❌ Но они частично живут в одном репо, частично в разных
+❌ Это создаёт путаницу: где деплой? где README? где CI?
+
+✅ ПРАВИЛЬНЫЕ ВАРИАНТЫ (их всего 2)
+🟢 ВАРИАНТ A (РЕКОМЕНДУЮ) — MONOREPO
+
+Один репозиторий → все сервисы внутри
+
+📌 Это идеально для pet / interview / junior–middle проектов
+
+Как должно выглядеть:
+Farm-Market-Microservices/
+├── api-gateway/
+├── auth-service/
+├── product-service/
+├── farm-market/
+├── shared-kafka-events/
+├── frontend/
+├── docker-compose.yml
+├── .env.example
+├── .gitignore
+└── README.md
+
+Что делать:
+
+Создаёшь НОВЫЙ репозиторий
+
+Farm-Market-Microservices
+
+
+Копируешь туда все сервисы
+
+Старые репозитории:
+
+❌ Farm-Market-Project — архивируешь
+
+❌ Market-Frontend-Planto — архивируешь
+
+❌ shared-kafka-events — можно оставить отдельно ИЛИ перенести внутрь
+
+📌 На собесе это звучит так:
+
+“I use a monorepo for better visibility and easier local orchestration with Docker Compose.”
+
+🔥 Это очень хороший ответ
+
+
+
+🧠 Как это ОБЪЯСНЯТЬ НА СОБЕСЕ (ЗАПОМНИ)
+
+“Initially the project was a monolith, so everything lived in a single repository.
+After migrating to microservices, I consolidated all services into a monorepo to simplify local development, Docker orchestration, and architecture review.
+Each service still has clear boundaries and can be extracted into a separate repository if needed
+
+=====================================================================================================================================================

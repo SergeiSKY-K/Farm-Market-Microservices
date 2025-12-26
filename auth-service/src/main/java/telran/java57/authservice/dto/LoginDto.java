@@ -1,0 +1,9 @@
+package telran.java57.authservice.dto;
+
+import lombok.Data;
+
+@Data
+public class LoginDto {
+    private String login;
+    private String password;
+}
