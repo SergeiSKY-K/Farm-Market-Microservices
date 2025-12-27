@@ -22,10 +22,24 @@ public class GatewayHeadersAuthFilter extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
 
+        String path = request.getRequestURI();
+
+        if (
+                path.equals("/auth/login") ||
+                        path.equals("/auth/refresh") ||
+                        path.equals("/users/register") ||
+                        request.getMethod().equalsIgnoreCase("OPTIONS")
+        ) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         String login = request.getHeader("X-User-Login");
         String rolesHeader = request.getHeader("X-User-Roles");
 
-        if (login != null && !login.isBlank() && SecurityContextHolder.getContext().getAuthentication() == null) {
+        if (login != null && !login.isBlank()
+                && SecurityContextHolder.getContext().getAuthentication() == null) {
+
             var authorities = (rolesHeader == null || rolesHeader.isBlank())
                     ? java.util.List.<SimpleGrantedAuthority>of()
                     : Arrays.stream(rolesHeader.split(","))
@@ -41,4 +55,5 @@ public class GatewayHeadersAuthFilter extends OncePerRequestFilter {
 
         filterChain.doFilter(request, response);
     }
+
 }

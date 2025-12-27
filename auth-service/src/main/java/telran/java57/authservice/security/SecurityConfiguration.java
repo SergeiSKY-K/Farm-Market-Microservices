@@ -31,6 +31,10 @@ public class SecurityConfiguration {
         http.sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
         http.authorizeHttpRequests(auth -> auth
+
+                // CORS preflight
+                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+
                 // public auth
                 .requestMatchers("/auth/login", "/auth/refresh").permitAll()
                 .requestMatchers(HttpMethod.POST, "/users/register").permitAll()
