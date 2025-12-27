@@ -31,43 +31,30 @@ public class SecurityConfiguration {
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
                 .authorizeHttpRequests(auth -> auth
-
-                        // CORS
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
-                        // Oablic
-                        .requestMatchers("/auth/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/login", "/refresh").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/logout").permitAll()
-
-                        // registration
+                        // public
+                        .requestMatchers(HttpMethod.POST, "/login", "/refresh", "/logout").permitAll()
                         .requestMatchers(HttpMethod.POST, "/users/register").permitAll()
 
-                        // self-service
+
                         .requestMatchers(HttpMethod.PUT,  "/users/password").authenticated()
                         .requestMatchers(HttpMethod.GET,  "/users/user/*").authenticated()
                         .requestMatchers(HttpMethod.PUT,  "/users/user/*").authenticated()
                         .requestMatchers(HttpMethod.DELETE, "/users/user/*").authenticated()
 
-                        // admin / moderator
                         .requestMatchers(HttpMethod.GET, "/users").hasRole("ADMINISTRATOR")
-                        .requestMatchers(HttpMethod.GET, "/users/suppliers")
-                        .hasAnyRole("MODERATOR", "ADMINISTRATOR")
+                        .requestMatchers(HttpMethod.GET, "/users/suppliers").hasAnyRole("MODERATOR","ADMINISTRATOR")
 
-                        // role management
-                        .requestMatchers(HttpMethod.PUT, "/users/user/*/role/SUPPLIER")
-                        .hasAnyRole("MODERATOR", "ADMINISTRATOR")
-                        .requestMatchers(HttpMethod.DELETE, "/users/user/*/role/SUPPLIER")
-                        .hasAnyRole("MODERATOR", "ADMINISTRATOR")
+                        .requestMatchers(HttpMethod.PUT, "/users/user/*/role/SUPPLIER").hasAnyRole("MODERATOR","ADMINISTRATOR")
+                        .requestMatchers(HttpMethod.DELETE, "/users/user/*/role/SUPPLIER").hasAnyRole("MODERATOR","ADMINISTRATOR")
 
-                        .requestMatchers(HttpMethod.PUT, "/users/user/*/role/*")
-                        .hasRole("ADMINISTRATOR")
-                        .requestMatchers(HttpMethod.DELETE, "/users/user/*/role/*")
-                        .hasRole("ADMINISTRATOR")
-
+                        .requestMatchers(HttpMethod.PUT, "/users/user/*/role/*").hasRole("ADMINISTRATOR")
+                        .requestMatchers(HttpMethod.DELETE, "/users/user/*/role/*").hasRole("ADMINISTRATOR")
 
                         .anyRequest().denyAll()
                 );
+
 
         http.addFilterBefore(gatewayHeadersAuthFilter, UsernamePasswordAuthenticationFilter.class);
 

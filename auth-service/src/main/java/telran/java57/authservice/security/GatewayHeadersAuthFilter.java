@@ -20,16 +20,18 @@ public class GatewayHeadersAuthFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String path = request.getRequestURI();
+        String method = request.getMethod();
+
+        // CORS preflight
+        if ("OPTIONS".equalsIgnoreCase(method)) return true;
 
 
-        if ("OPTIONS".equalsIgnoreCase(request.getMethod())) return true;
-
-
-        if (path.startsWith("/auth/")) return true;
-        if (path.equals("/login") || path.equals("/refresh") || path.equals("/logout")) return true;
-
-
-        if (path.equals("/users/register") || path.equals("/auth/users/register")) return true;
+        if ("POST".equalsIgnoreCase(method)) {
+            return path.equals("/login")
+                    || path.equals("/refresh")
+                    || path.equals("/logout")
+                    || path.equals("/users/register");
+        }
 
         return false;
     }
@@ -41,12 +43,15 @@ public class GatewayHeadersAuthFilter extends OncePerRequestFilter {
             FilterChain filterChain
     ) throws ServletException, IOException {
 
+        if (SecurityContextHolder.getContext().getAuthentication() != null) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         String login = request.getHeader("X-User-Login");
         String rolesHeader = request.getHeader("X-User-Roles");
 
-        if (login != null && !login.isBlank()
-                && SecurityContextHolder.getContext().getAuthentication() == null) {
-
+        if (login != null && !login.isBlank()) {
             List<SimpleGrantedAuthority> authorities =
                     (rolesHeader == null || rolesHeader.isBlank())
                             ? List.of()
