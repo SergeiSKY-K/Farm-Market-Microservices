@@ -18,6 +18,15 @@ import java.util.stream.Collectors;
 public class GatewayHeadersAuthFilter extends OncePerRequestFilter {
 
     @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String path = request.getRequestURI();
+        return path.startsWith("/auth/login")
+                || path.startsWith("/auth/refresh")
+                || path.startsWith("/users/register");
+    }
+
+
+    @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
