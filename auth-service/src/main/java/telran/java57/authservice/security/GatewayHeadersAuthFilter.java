@@ -12,7 +12,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.stream.Collectors;
+import java.util.List;
 
 @Component
 public class GatewayHeadersAuthFilter extends OncePerRequestFilter {
@@ -20,28 +20,26 @@ public class GatewayHeadersAuthFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String path = request.getRequestURI();
-        return path.startsWith("/auth/login")
-                || path.startsWith("/auth/refresh")
-                || path.startsWith("/users/register");
+
+
+        if ("OPTIONS".equalsIgnoreCase(request.getMethod())) return true;
+
+
+        if (path.startsWith("/auth/")) return true;
+        if (path.equals("/login") || path.equals("/refresh") || path.equals("/logout")) return true;
+
+
+        if (path.equals("/users/register") || path.equals("/auth/users/register")) return true;
+
+        return false;
     }
 
-
     @Override
-    protected void doFilterInternal(HttpServletRequest request,
-                                    HttpServletResponse response,
-                                    FilterChain filterChain) throws ServletException, IOException {
-
-        String path = request.getRequestURI();
-
-        if (
-                path.equals("/auth/login") ||
-                        path.equals("/auth/refresh") ||
-                        path.equals("/users/register") ||
-                        request.getMethod().equalsIgnoreCase("OPTIONS")
-        ) {
-            filterChain.doFilter(request, response);
-            return;
-        }
+    protected void doFilterInternal(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            FilterChain filterChain
+    ) throws ServletException, IOException {
 
         String login = request.getHeader("X-User-Login");
         String rolesHeader = request.getHeader("X-User-Roles");
@@ -49,14 +47,15 @@ public class GatewayHeadersAuthFilter extends OncePerRequestFilter {
         if (login != null && !login.isBlank()
                 && SecurityContextHolder.getContext().getAuthentication() == null) {
 
-            var authorities = (rolesHeader == null || rolesHeader.isBlank())
-                    ? java.util.List.<SimpleGrantedAuthority>of()
-                    : Arrays.stream(rolesHeader.split(","))
-                    .map(String::trim)
-                    .filter(s -> !s.isBlank())
-                    .map(r -> r.startsWith("ROLE_") ? r : "ROLE_" + r)
-                    .map(SimpleGrantedAuthority::new)
-                    .collect(Collectors.toList());
+            List<SimpleGrantedAuthority> authorities =
+                    (rolesHeader == null || rolesHeader.isBlank())
+                            ? List.of()
+                            : Arrays.stream(rolesHeader.split(","))
+                            .map(String::trim)
+                            .filter(s -> !s.isBlank())
+                            .map(r -> r.startsWith("ROLE_") ? r : "ROLE_" + r)
+                            .map(SimpleGrantedAuthority::new)
+                            .toList();
 
             var auth = new UsernamePasswordAuthenticationToken(login, null, authorities);
             SecurityContextHolder.getContext().setAuthentication(auth);
@@ -64,5 +63,4 @@ public class GatewayHeadersAuthFilter extends OncePerRequestFilter {
 
         filterChain.doFilter(request, response);
     }
-
 }

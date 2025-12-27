@@ -35,14 +35,15 @@ public class SecurityConfiguration {
                         // CORS
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
-                        // Oublic
+                        // Oablic
+                        .requestMatchers("/auth/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/login", "/refresh").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/logout").permitAll()
 
                         // registration
                         .requestMatchers(HttpMethod.POST, "/users/register").permitAll()
 
                         // self-service
-                        .requestMatchers(HttpMethod.POST, "/logout").authenticated()
                         .requestMatchers(HttpMethod.PUT,  "/users/password").authenticated()
                         .requestMatchers(HttpMethod.GET,  "/users/user/*").authenticated()
                         .requestMatchers(HttpMethod.PUT,  "/users/user/*").authenticated()
@@ -64,13 +65,11 @@ public class SecurityConfiguration {
                         .requestMatchers(HttpMethod.DELETE, "/users/user/*/role/*")
                         .hasRole("ADMINISTRATOR")
 
+
                         .anyRequest().denyAll()
                 );
 
-        http.addFilterBefore(
-                gatewayHeadersAuthFilter,
-                UsernamePasswordAuthenticationFilter.class
-        );
+        http.addFilterBefore(gatewayHeadersAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
