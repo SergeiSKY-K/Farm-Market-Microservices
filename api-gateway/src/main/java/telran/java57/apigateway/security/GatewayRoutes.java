@@ -12,9 +12,14 @@ public class GatewayRoutes {
     public RouteLocator routes(RouteLocatorBuilder builder) {
         return builder.routes()
 
-                .route("auth-service", r -> r
-                        .path("/auth/**", "/users/**")
+                .route("auth-service-auth", r -> r
+                        .path("/auth/**")
                         .filters(f -> f.stripPrefix(1))
+                        .uri("https://auth-service-f376.onrender.com")
+                )
+
+                .route("auth-service-users", r -> r
+                        .path("/users/**")
                         .uri("https://auth-service-f376.onrender.com")
                 )
 
