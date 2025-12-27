@@ -1,14 +1,13 @@
 package telran.java57.authservice.security;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -26,41 +25,52 @@ public class SecurityConfiguration {
     @Bean
     public SecurityFilterChain security(HttpSecurity http) throws Exception {
 
-        http.csrf(csrf -> csrf.disable());
-        http.cors(Customizer.withDefaults());
-        http.sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+        http
+                .csrf(csrf -> csrf.disable())
+                .cors(Customizer.withDefaults())
+                .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
-        http.authorizeHttpRequests(auth -> auth
+                .authorizeHttpRequests(auth -> auth
 
-                // CORS preflight
-                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        // CORS
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
-                // public auth
-                .requestMatchers("/auth/login", "/auth/refresh").permitAll()
-                .requestMatchers(HttpMethod.POST, "/users/register").permitAll()
+                        // Oublic
+                        .requestMatchers(HttpMethod.POST, "/login", "/refresh").permitAll()
 
-                // self-service
-                .requestMatchers(HttpMethod.POST, "/auth/logout").authenticated()
-                .requestMatchers(HttpMethod.PUT,  "/users/password").authenticated()
-                .requestMatchers(HttpMethod.GET,  "/users/user/*").authenticated()
-                .requestMatchers(HttpMethod.PUT,  "/users/user/*").authenticated()
-                .requestMatchers(HttpMethod.DELETE, "/users/user/*").authenticated()
+                        // registration
+                        .requestMatchers(HttpMethod.POST, "/users/register").permitAll()
 
-                // admin / moderator
-                .requestMatchers(HttpMethod.GET, "/users").hasRole("ADMINISTRATOR")
-                .requestMatchers(HttpMethod.GET, "/users/suppliers").hasAnyRole("MODERATOR","ADMINISTRATOR")
+                        // self-service
+                        .requestMatchers(HttpMethod.POST, "/logout").authenticated()
+                        .requestMatchers(HttpMethod.PUT,  "/users/password").authenticated()
+                        .requestMatchers(HttpMethod.GET,  "/users/user/*").authenticated()
+                        .requestMatchers(HttpMethod.PUT,  "/users/user/*").authenticated()
+                        .requestMatchers(HttpMethod.DELETE, "/users/user/*").authenticated()
 
-                // role management
-                .requestMatchers(HttpMethod.PUT, "/users/user/*/role/SUPPLIER").hasAnyRole("MODERATOR","ADMINISTRATOR")
-                .requestMatchers(HttpMethod.DELETE, "/users/user/*/role/SUPPLIER").hasAnyRole("MODERATOR","ADMINISTRATOR")
+                        // admin / moderator
+                        .requestMatchers(HttpMethod.GET, "/users").hasRole("ADMINISTRATOR")
+                        .requestMatchers(HttpMethod.GET, "/users/suppliers")
+                        .hasAnyRole("MODERATOR", "ADMINISTRATOR")
 
-                .requestMatchers(HttpMethod.PUT, "/users/user/*/role/*").hasRole("ADMINISTRATOR")
-                .requestMatchers(HttpMethod.DELETE, "/users/user/*/role/*").hasRole("ADMINISTRATOR")
+                        // role management
+                        .requestMatchers(HttpMethod.PUT, "/users/user/*/role/SUPPLIER")
+                        .hasAnyRole("MODERATOR", "ADMINISTRATOR")
+                        .requestMatchers(HttpMethod.DELETE, "/users/user/*/role/SUPPLIER")
+                        .hasAnyRole("MODERATOR", "ADMINISTRATOR")
 
-                .anyRequest().denyAll()
+                        .requestMatchers(HttpMethod.PUT, "/users/user/*/role/*")
+                        .hasRole("ADMINISTRATOR")
+                        .requestMatchers(HttpMethod.DELETE, "/users/user/*/role/*")
+                        .hasRole("ADMINISTRATOR")
+
+                        .anyRequest().denyAll()
+                );
+
+        http.addFilterBefore(
+                gatewayHeadersAuthFilter,
+                UsernamePasswordAuthenticationFilter.class
         );
-
-        http.addFilterBefore(gatewayHeadersAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
