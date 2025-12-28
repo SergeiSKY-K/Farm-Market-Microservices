@@ -11,7 +11,6 @@ import telran.java57.authservice.service.AuthService;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/auth")
 public class AuthController {
 
     private final AuthService authService;
