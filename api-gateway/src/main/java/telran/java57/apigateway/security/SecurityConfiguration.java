@@ -26,11 +26,20 @@ public class SecurityConfiguration {
 
                 .authorizeExchange(exchange -> exchange
                         .pathMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .pathMatchers("/auth/**", "/users/register").permitAll()
+
+                        .pathMatchers(
+                                "/auth/**",
+                                "/login",
+                                "/refresh",
+                                "/logout",
+                                "/users/register"
+                        ).permitAll()
+
                         .anyExchange().authenticated()
                 )
 
                 .addFilterAt(jwtFilter, SecurityWebFiltersOrder.AUTHENTICATION)
+
                 .build();
     }
 }
