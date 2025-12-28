@@ -29,9 +29,6 @@ public class SecurityConfiguration {
 
                         .pathMatchers(
                                 "/auth/**",
-                                "/login",
-                                "/refresh",
-                                "/logout",
                                 "/users/register"
                         ).permitAll()
 
@@ -39,7 +36,6 @@ public class SecurityConfiguration {
                 )
 
                 .addFilterAt(jwtFilter, SecurityWebFiltersOrder.AUTHENTICATION)
-
                 .build();
     }
 }
