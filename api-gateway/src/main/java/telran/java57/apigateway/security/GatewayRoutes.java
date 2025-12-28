@@ -14,7 +14,6 @@ public class GatewayRoutes {
 
                 .route("auth-service-auth", r -> r
                         .path("/auth/**")
-                        .filters(f -> f.stripPrefix(1))
                         .uri("https://auth-service-f376.onrender.com")
                 )
 
