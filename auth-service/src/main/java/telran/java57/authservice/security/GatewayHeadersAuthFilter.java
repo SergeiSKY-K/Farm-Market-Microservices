@@ -29,9 +29,9 @@ public class GatewayHeadersAuthFilter extends OncePerRequestFilter {
         if ("OPTIONS".equalsIgnoreCase(method)) return true;
 
         if ("POST".equalsIgnoreCase(method)) {
-            return path.equals("/login")
-                    || path.equals("/refresh")
-                    || path.equals("/logout")
+            return path.equals("/auth/login")
+                    || path.equals("/auth/refresh")
+                    || path.equals("/auth/logout")
                     || path.equals("/users/register");
         }
 

@@ -37,9 +37,9 @@ public class SecurityConfiguration {
 
                         // AUTH (PUBLIC)
                         .requestMatchers(HttpMethod.POST,
-                                "/login",
-                                "/refresh",
-                                "/logout",
+                                "/auth/login",
+                                "/auth/refresh",
+                                "/auth/logout",
                                 "/users/register"
                         ).permitAll()
 
