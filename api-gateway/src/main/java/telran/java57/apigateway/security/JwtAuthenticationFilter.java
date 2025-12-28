@@ -32,39 +32,39 @@ public class JwtAuthenticationFilter implements WebFilter {
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
 
-        ServerHttpRequest.Builder requestBuilder = exchange.getRequest()
-                .mutate()
-                .headers(h -> {
-                    h.remove("X-User-Login");
-                    h.remove("X-User-Roles");
-                    h.remove("X-Gateway-Key");
-                    h.add("X-Gateway-Key", gatewaySecret);
-                });
-
-        var header = exchange.getRequest()
+        String authHeader = exchange.getRequest()
                 .getHeaders()
                 .getFirst(HttpHeaders.AUTHORIZATION);
 
 
-        if (header == null || !header.startsWith("Bearer ")) {
-            return chain.filter(exchange.mutate().request(requestBuilder.build()).build());
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return chain.filter(exchange);
         }
 
+
         try {
-            String token = header.substring(7);
+            String token = authHeader.substring(7);
             DecodedJWT jwt = jwtUtil.validate(token);
 
             String username = jwt.getSubject();
 
-            var roles = Optional
+            List<String> roles = Optional
                     .ofNullable(jwt.getClaim("roles").asList(String.class))
                     .orElse(List.of());
 
 
-            requestBuilder.headers(h -> {
-                h.add("X-User-Login", username);
-                h.add("X-User-Roles", String.join(",", roles));
-            });
+            ServerHttpRequest mutatedRequest = exchange.getRequest()
+                    .mutate()
+                    .headers(h -> {
+                        h.remove("X-User-Login");
+                        h.remove("X-User-Roles");
+                        h.remove("X-Gateway-Key");
+
+                        h.add("X-User-Login", username);
+                        h.add("X-User-Roles", String.join(",", roles));
+                        h.add("X-Gateway-Key", gatewaySecret);
+                    })
+                    .build();
 
             var authorities = roles.stream()
                     .map(String::trim)
@@ -76,7 +76,7 @@ public class JwtAuthenticationFilter implements WebFilter {
             var authentication =
                     new UsernamePasswordAuthenticationToken(username, null, authorities);
 
-            return chain.filter(exchange.mutate().request(requestBuilder.build()).build())
+            return chain.filter(exchange.mutate().request(mutatedRequest).build())
                     .contextWrite(ReactiveSecurityContextHolder.withAuthentication(authentication));
 
         } catch (Exception ex) {
