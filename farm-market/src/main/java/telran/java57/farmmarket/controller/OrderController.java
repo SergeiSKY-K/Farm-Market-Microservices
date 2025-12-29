@@ -7,7 +7,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import telran.java57.farmmarket.dto.OrderDto;
 import telran.java57.farmmarket.dto.OrderResponseDto;
@@ -24,16 +26,25 @@ public class OrderController {
 
     @PostMapping
     public ResponseEntity<OrderResponseDto> createOrder(
-            @RequestBody OrderDto orderDto,
-            Authentication authentication
-    )
+            @RequestBody OrderDto orderDto
+    ) {
+        Authentication authentication =
+                SecurityContextHolder.getContext().getAuthentication();
 
-    {
-        System.out.println("DTO = " + orderDto);
-        System.out.println("MAP = " + (orderDto == null ? null : orderDto.getProductQuantities()));
+        if (authentication == null
+                || !authentication.isAuthenticated()
+                || "anonymousUser".equals(authentication.getName())) {
+            throw new AccessDeniedException("Unauthenticated");
+        }
+
         String userLogin = authentication.getName();
-        OrderResponseDto response = orderService.createOrder(orderDto, userLogin);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+
+        OrderResponseDto response =
+                orderService.createOrder(orderDto, userLogin);
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(response);
     }
 
     @PostMapping("/{id}/pay")
