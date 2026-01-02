@@ -38,7 +38,8 @@ public class JwtAuthenticationFilter implements WebFilter {
 
         if (method == HttpMethod.OPTIONS
                 || path.startsWith("/auth/")
-                || path.equals("/users/register")) {
+                || path.equals("/users/register")
+                || path.startsWith("/files/")) {
             return chain.filter(exchange);
         }
 

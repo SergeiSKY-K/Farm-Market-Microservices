@@ -31,6 +31,7 @@ public class SecurityConfiguration {
                 .authorizeExchange(exchange -> exchange
                         .pathMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .pathMatchers("/auth/**", "/users/register").permitAll()
+                        .pathMatchers("/files/**").permitAll()
                         .anyExchange().authenticated()
                 )
 
