@@ -46,6 +46,7 @@ public class SecurityConfiguration {
                 .requestMatchers(HttpMethod.POST, "/orders").authenticated()
                 .requestMatchers(HttpMethod.POST, "/orders/*/pay").authenticated()
                 .requestMatchers(HttpMethod.GET, "/orders/my").authenticated()
+                .requestMatchers(HttpMethod.DELETE, "/orders/*").authenticated()
                 .requestMatchers(HttpMethod.GET, "/orders/supplier")
                 .hasAnyRole("SUPPLIER","ADMINISTRATOR")
                 .requestMatchers(HttpMethod.GET, "/orders/moderator")
