@@ -46,7 +46,14 @@ public class OrderController {
                 .status(HttpStatus.CREATED)
                 .body(response);
     }
-
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteOrder(
+            @PathVariable String id,
+            Authentication authentication
+    ) {
+        orderService.deleteCreatedOrder(id, authentication.getName());
+        return ResponseEntity.noContent().build();
+    }
     @PostMapping("/{id}/pay")
     public OrderResponseDto payForOrder(
             @PathVariable String id,

@@ -86,7 +86,22 @@ public class OrderServiceImpl implements OrderService{
         return modelMapper.map(order, OrderResponseDto.class);
     }
 
+    @Override
+    public void deleteCreatedOrder(String orderId, String userLogin) {
 
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new OrderNotFoundException(orderId));
+
+        if (!order.getUserLogin().equals(userLogin)) {
+            throw new AccessDeniedException("You can delete only your own order");
+        }
+
+        if (order.getStatus() != OrderStatus.CREATED) {
+            throw new IllegalStateException("Only CREATED orders can be deleted");
+        }
+
+        orderRepository.delete(order);
+    }
     @Override
     public OrderResponseDto markOrderAsPaid(String orderId, String userLogin) {
 

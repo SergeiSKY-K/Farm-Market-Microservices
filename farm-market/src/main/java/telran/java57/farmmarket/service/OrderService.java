@@ -13,4 +13,6 @@ public interface OrderService {
     List<OrderResponseDto> getMyOrders(String userLogin);
     List<OrderResponseDto> getOrdersBySupplierLogin(String supplierLogin);
     Page<OrderResponseDto> getAllOrders(Pageable pageable);
+
+    void deleteCreatedOrder(String orderId, String userLogin);
 }
