@@ -4,6 +4,7 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -31,6 +32,16 @@ public class JwtAuthenticationFilter implements WebFilter {
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
+
+        String path = exchange.getRequest().getPath().value();
+        HttpMethod method = exchange.getRequest().getMethod();
+
+        if (method == HttpMethod.OPTIONS
+                || path.startsWith("/auth/")
+                || path.equals("/users/register")) {
+            return chain.filter(exchange);
+        }
+
 
         String authHeader = exchange.getRequest()
                 .getHeaders()
