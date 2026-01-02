@@ -34,11 +34,15 @@ public class SecurityConfiguration {
                             exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
                             return exchange.getResponse().setComplete();
                         })
+                        .accessDeniedHandler((exchange, e) -> {
+                            exchange.getResponse().setStatusCode(HttpStatus.FORBIDDEN);
+                            return exchange.getResponse().setComplete();
+                        })
                 )
-
 
                 .authorizeExchange(exchange -> exchange
                         .pathMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        .pathMatchers("/", "/health").permitAll()
                         .pathMatchers("/auth/**", "/users/register").permitAll()
                         .pathMatchers("/files/**").permitAll()
                         .anyExchange().authenticated()

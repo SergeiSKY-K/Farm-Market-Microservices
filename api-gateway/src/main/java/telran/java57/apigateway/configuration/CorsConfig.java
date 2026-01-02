@@ -23,6 +23,8 @@ public class CorsConfig {
         config.addAllowedHeader("*");
         config.addAllowedMethod("*");
         config.addExposedHeader("Authorization");
+        config.addExposedHeader("X-User-Login");
+        config.addExposedHeader("X-User-Roles");
 
         UrlBasedCorsConfigurationSource source =
                 new UrlBasedCorsConfigurationSource();
