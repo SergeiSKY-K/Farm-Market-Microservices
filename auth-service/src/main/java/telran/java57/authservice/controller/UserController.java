@@ -3,6 +3,7 @@ package telran.java57.authservice.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import telran.java57.authservice.dto.*;
 import telran.java57.authservice.service.UserService;
@@ -26,6 +27,7 @@ public class UserController {
         return userService.removeUser(login);
     }
 
+    @PreAuthorize("#login == authentication.name or hasRole('ADMINISTRATOR')")
     @GetMapping("/user/{login}")
     public UserDto getUserByLogin(@PathVariable String login) {
         return userService.getUser(login);
