@@ -22,6 +22,7 @@ public class UserController {
         return userService.register(userRegisterDto);
     }
 
+    @PreAuthorize("#login == authentication.name or hasRole('ADMINISTRATOR')")
     @DeleteMapping("/user/{login}")
     public UserDto removeUser(@PathVariable String login) {
         return userService.removeUser(login);
@@ -33,6 +34,7 @@ public class UserController {
         return userService.getUser(login);
     }
 
+    @PreAuthorize("#login == authentication.name or hasRole('ADMINISTRATOR')")
     @PutMapping("/user/{login}")
     public UserDto updateUser(@PathVariable String login, @RequestBody UpdateUserDto updateUserDto) {
         return userService.updateUser(login, updateUserDto);
