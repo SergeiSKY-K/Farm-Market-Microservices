@@ -37,17 +37,16 @@ public class JwtAuthenticationFilter implements WebFilter {
         HttpMethod method = exchange.getRequest().getMethod();
 
         if (method == HttpMethod.OPTIONS
-                || path.startsWith("/auth/")
-                || path.equals("/users/register")
+                || (method == HttpMethod.POST && path.equals("/auth/login"))
+                || (method == HttpMethod.POST && path.equals("/auth/refresh"))
+                || (method == HttpMethod.POST && path.equals("/users/register"))
                 || path.startsWith("/files/")) {
             return chain.filter(exchange);
         }
 
-
         String authHeader = exchange.getRequest()
                 .getHeaders()
                 .getFirst(HttpHeaders.AUTHORIZATION);
-
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
@@ -63,7 +62,6 @@ public class JwtAuthenticationFilter implements WebFilter {
             List<String> roles = Optional
                     .ofNullable(jwt.getClaim("roles").asList(String.class))
                     .orElse(List.of());
-
 
             ServerHttpRequest mutatedRequest = exchange.getRequest()
                     .mutate()

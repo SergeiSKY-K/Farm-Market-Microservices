@@ -43,7 +43,9 @@ public class SecurityConfiguration {
                 .authorizeExchange(exchange -> exchange
                         .pathMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .pathMatchers("/", "/health").permitAll()
-                        .pathMatchers("/auth/**", "/users/register").permitAll()
+                        .pathMatchers(HttpMethod.POST, "/auth/login").permitAll()
+                        .pathMatchers(HttpMethod.POST, "/auth/refresh").permitAll()
+                        .pathMatchers(HttpMethod.POST, "/users/register").permitAll()
                         .pathMatchers("/files/**").permitAll()
                         .anyExchange().authenticated()
                 )
