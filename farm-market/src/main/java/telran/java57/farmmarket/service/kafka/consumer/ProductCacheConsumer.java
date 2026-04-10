@@ -42,9 +42,12 @@ public class ProductCacheConsumer {
         log.info("🔥 Cache UPDATED {}", ev);
 
         ProductCache cache = repository.findById(ev.getProductId())
-                .orElseThrow(() ->
-                        new IllegalStateException("Cache missing for product " + ev.getProductId())
-                );
+                .orElseGet(() -> {
+                    log.warn("⚠️ Cache missing for product {}, creating from update event", ev.getProductId());
+                    return ProductCache.builder()
+                            .productId(ev.getProductId())
+                            .build();
+                });
 
         cache.setName(ev.getName());
         cache.setQuantity(ev.getQuantity());
@@ -61,6 +64,4 @@ public class ProductCacheConsumer {
         log.info("🔥 Cache DELETED {}", ev);
         repository.deleteById(ev.getProductId());
     }
-
-
 }
