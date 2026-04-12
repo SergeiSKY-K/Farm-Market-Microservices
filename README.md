@@ -115,3 +115,22 @@ A `.env.example` file is provided.
 
 ```bash
 docker-compose up --build
+
+## Problems Solved
+
+- Implemented secure JWT authentication with access and refresh tokens
+- Designed API Gateway for centralized authentication and routing
+- Solved user identity propagation between microservices via headers
+- Implemented role-based access control across services
+- Handled CORS issues between frontend and backend
+- Built event-driven architecture using Kafka
+- Managed stateless authentication in a distributed system
+
+## What I Learned
+
+- Microservices architecture design
+- API Gateway patterns
+- JWT authentication best practices
+- Event-driven systems with Kafka
+- Secure communication between services
+- Debugging distributed systems
