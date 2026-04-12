@@ -111,11 +111,6 @@ A `.env.example` file is provided.
 
 ---
 
-## Run Locally
-
-```bash
-docker-compose up --build
-
 ## Problems Solved
 
 - Implemented secure JWT authentication with access and refresh tokens
@@ -134,3 +129,9 @@ docker-compose up --build
 - Event-driven systems with Kafka
 - Secure communication between services
 - Debugging distributed systems
+
+
+## Run Locally
+
+```bash
+docker-compose up --build
