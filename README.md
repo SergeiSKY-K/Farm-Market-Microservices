@@ -37,6 +37,7 @@ Flow:
 
 Client → API Gateway → Services → MongoDB  
                      ↘ Kafka
+                     
 ---
 ## 👥 Roles
 
